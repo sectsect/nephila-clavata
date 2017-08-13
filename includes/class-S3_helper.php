@@ -6,8 +6,14 @@ if ( file_exists(plugin_dir_path( __FILE__ ) . 'composer/vendor/autoload.php') )
 use Aws\Common\Aws;
 use Aws\Common\Enum\Region;
 use Aws\S3\Enum\CannedAcl;
-use Aws\S3\Exception\S3Exception;
-use Guzzle\Http\EntityBody;
+// use Aws\S3\S3Client;
+// use Aws\S3\Exception\S3Exception;
+// use Guzzle\Http\EntityBody;
+
+use Aws\S3\S3Client;
+use Aws\Exception\AwsException;
+use GuzzleHttp\EntityBody;
+
 
 class S3_helper {
 	private static $instance;
@@ -53,7 +59,9 @@ class S3_helper {
 			'region' => $this->get_region($region),
             'version' => $this->s3_api_version,
 		);
-		$s3 = Aws::factory( apply_filters( 'nephila_clavata_credential', $param ) )->get('s3');
+		// $s3 = Aws::factory( apply_filters( 'nephila_clavata_credential', $param ) )->get('s3');
+		$s3 = new \Aws\S3\S3Client( apply_filters( 'nephila_clavata_credential', $param ) );
+
 		$this->s3 = $s3;
 		return $s3;
 	}
@@ -104,7 +112,7 @@ class S3_helper {
 				return false;
 			$response = $this->s3->putObject($args);
 			return $response;
-		} catch (S3Exception $e) {
+		} catch (Aws\Exception\S3Exception $e) {
 			error_log($e->__toString(),0);
 			return false;
 		}
@@ -131,7 +139,7 @@ class S3_helper {
 			$response['Body']->rewind();
 			file_put_contents($download_path, $response['Body']->read($response['ContentLength']));
 			return $response;
-		} catch (S3Exception $e) {
+		} catch (Aws\Exception\S3Exception $e) {
 			error_log($e->__toString(),0);
 			return false;
 		}
@@ -152,7 +160,7 @@ class S3_helper {
 				return false;
 			$response = $this->s3->deleteObject($args);
 			return $response;
-		} catch (S3Exception $e) {
+		} catch (Aws\Exception\S3Exception $e) {
 			error_log($e->__toString(),0);
 			return false;
 		}
@@ -165,7 +173,7 @@ class S3_helper {
 		try {
 			$list_buckets = $this->s3->listBuckets();
 			return isset($list_buckets["Buckets"]) ? $list_buckets["Buckets"] : false;
-		} catch (S3Exception $e) {
+		} catch (Aws\Exception\S3Exception $e) {
 			error_log($e->__toString(),0);
 			return false;
 		}
