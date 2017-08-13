@@ -1,7 +1,8 @@
 <?php
-if( ! defined("AWS-2.8.22.PHAR_PHAR") ){
-	require_once(dirname(__FILE__).'/aws.phar');
+if ( file_exists(plugin_dir_path( __FILE__ ) . 'composer/vendor/autoload.php') ) {
+	require_once plugin_dir_path( __FILE__ ) . 'composer/vendor/autoload.php';
 }
+
 use Aws\Common\Aws;
 use Aws\Common\Enum\Region;
 use Aws\S3\Enum\CannedAcl;
